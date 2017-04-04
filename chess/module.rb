@@ -1,6 +1,6 @@
 module Stepable
   def moves
-    moves_diff
+    move_diff
   end
 
   private
@@ -9,6 +9,8 @@ module Stepable
 
   end
 end
+
+
 
 
 module Slideable
@@ -32,17 +34,21 @@ module Slideable
 
   def grow_unblocked_moves_in_dir(dx, dy)
     move_arr = []
-    move = [@pos[0], @pos[1]]
+    move = [@pos[0] + dx, @pos[1] + dy]
     while valid(move)
-      move = [move[0] + dx, move[1] + dy]
       move_arr << move
+      move = [move[0] + dx, move[1] + dy]
     end
-
-    move_arr.select {|move| @board[move] == Nullpiece.instance || @board[move].color != @color}
+    move_arr << move if valid(move) && @board[move].color != @color
+    move_arr
   end
 
+
   def valid(move)
-    move.all? {|idx| idx.between?(0,7) && @board[move] != Nullpiece.instance }
+    move.all? do |idx| idx.between?(0,7) &&
+      (@board[move] == Nullpiece.instance ||
+      @board[move].color == @board[move].opposite_color)
+    end
   end
 
 end

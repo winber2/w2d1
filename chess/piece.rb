@@ -2,17 +2,28 @@ require_relative "module"
 require 'singleton'
 
 class Piece
-  attr_reader :symbol, :pos, :board, :color
-  COLORS = {:white => :red, :black => :black}
+  attr_reader :symbol, :pos, :color
+  attr_accessor :selected, :board
+  COLORS = {:white => :red, :black => :black, nil => :black}
   def initialize(color, pos, board, symbol = nil)
     @symbol = symbol
     @board = board
     @color = color
     @pos = pos
+    @selected = false
   end
 
   def to_s
-    empty? ? "-" : "#{@symbol[0].upcase.colorize(:color => COLORS[@color], :background => :yellow)}"
+    empty? ? "-" : selected?
+  end
+
+
+  def selected?
+    unless @selected
+      "#{@symbol[0].upcase.colorize(:color => COLORS[@color], :background => :yellow)}"
+    else
+      "#{@symbol[0].upcase.colorize(:color => COLORS[@color], :background => :light_cyan)}"
+    end
   end
 
   def empty?
@@ -20,16 +31,22 @@ class Piece
   end
 
   def valid_moves
-    possible_moves = []
-    moves.each do |move|
-      possible_moves << @pos.map.with_index { |idx| @pos[idx] + move[idx]}
-    end
+    # possible_moves = []
+    # moves.each do |move|
+    #   possible_moves << @pos.map.with_index { |el, idx| el + move[idx]}
+    # end
+    #
+    # possible_moves
 
-    possible_moves
+    moves
   end
 
   def move_into_check(to_pos)
 
+  end
+
+  def opposite_color
+    @color == :white ? :black : :white
   end
 
 end
@@ -52,7 +69,7 @@ class Pawn < Piece
   end
 
   def forward_dir
-    @color == :white ? [1, 0] : [-1, 0]
+    @color == :white ? [-1, 0] : [1, 0]
   end
 
   def forward_steps
@@ -60,6 +77,10 @@ class Pawn < Piece
       forward_arr = [forward_dir, forward_dir.map { |el| el * 2 }]
     else
       forward_arr = [forward_dir]
+    end
+
+    forward_arr.map! do |diff|
+      [@pos[0] + diff[0], @pos[1] + diff[1]]
     end
 
     forward_arr.select do |move|
@@ -70,6 +91,11 @@ class Pawn < Piece
 
   def side_attacks
     att_arr = [[forward_dir[0], forward_dir[1] + 1], [forward_dir[0], forward_dir[1] - 1]]
+
+    att_arr.map! do |diff|
+      [@pos[0] + diff[0], @pos[1] + diff[1]]
+    end
+
     att_arr = att_arr.select { |move| move.all? {|idx| idx.between?(0,7)} }
     att_arr.select { |move| @board[move] != Nullpiece.instance && @board[move].color != @color}
   end
@@ -148,7 +174,7 @@ class Bishop < Piece
     move_arr = []
 
     diagonal_dirs.each do |dir|
-      move_arr << grow_unblocked_moves_in_dir(dir[0], dir[1])
+      move_arr += grow_unblocked_moves_in_dir(dir[0], dir[1])
     end
 
     move_arr
@@ -169,7 +195,7 @@ class Rook < Piece
     move_arr = []
 
     horizontal_dirs.each do |dir|
-      move_arr << grow_unblocked_moves_in_dir(dir[0], dir[1])
+      move_arr += grow_unblocked_moves_in_dir(dir[0], dir[1])
     end
 
     move_arr
@@ -189,11 +215,11 @@ class Queen < Piece
     move_arr = []
 
     diagonal_dirs.each do |dir|
-      move_arr << grow_unblocked_moves_in_dir(dir[0], dir[1])
+      move_arr += grow_unblocked_moves_in_dir(dir[0], dir[1])
     end
 
     horizontal_dirs.each do |dir|
-      move_arr << grow_unblocked_moves_in_dir(dir[0], dir[1])
+      move_arr += grow_unblocked_moves_in_dir(dir[0], dir[1])
     end
 
     move_arr

@@ -36,34 +36,34 @@ class Board
 
   def place_piece(pos)
     if pos == [0,0] || pos == [0,7]
-      self[pos] = Rook.new(:black, pos, @grid)
+      self[pos] = Rook.new(:black, pos, self)
     elsif pos == [7,0] || pos == [7,7]
-      self[pos] = Rook.new(:white, pos, @grid)
+      self[pos] = Rook.new(:white, pos, self)
 
     elsif pos == [0,1] || pos == [0,6]
-      self[pos] = Knight.new(:black, pos, @grid)
+      self[pos] = Knight.new(:black, pos, self)
     elsif pos == [7,1] || pos == [7,6]
-      self[pos] = Knight.new(:white, pos, @grid)
+      self[pos] = Knight.new(:white, pos, self)
 
     elsif pos == [0,2] || pos == [0,5]
-      self[pos] = Bishop.new(:black, pos, @grid)
+      self[pos] = Bishop.new(:black, pos, self)
     elsif pos == [7,2] || pos == [7,5]
-      self[pos] = Bishop.new(:white, pos, @grid)
+      self[pos] = Bishop.new(:white, pos, self)
 
     elsif pos == [0,3]
-      self[pos] = Queen.new(:black, pos, @grid)
+      self[pos] = Queen.new(:black, pos, self)
     elsif pos == [7,3]
-      self[pos] = Queen.new(:white, pos, @grid)
+      self[pos] = Queen.new(:white, pos, self)
 
     elsif pos == [0,4]
-      self[pos] = King.new(:black, pos, @grid)
+      self[pos] = King.new(:black, pos, self)
     elsif pos == [7,4]
-      self[pos] = King.new(:white, pos, @grid)
+      self[pos] = King.new(:white, pos, self)
 
     elsif pos[0] == 1
-      self[pos] = Pawn.new(:black, pos, @grid)
+      self[pos] = Pawn.new(:black, pos, self)
     elsif pos[0] == 6
-      self[pos] = Pawn.new(:white, pos, @grid)
+      self[pos] = Pawn.new(:white, pos, self)
 
     else
       self[pos] = Nullpiece.instance
@@ -80,14 +80,27 @@ class Board
   end
 
   def move_piece(from_pos, to_pos)
-    if self[from_pos] == Nullpiece.instance
+    if self[from_pos] == Nullpiece.instance || !valid?(from_pos, to_pos)
       raise "There is no piece"
-    else
-
     end
 
-    self[to_pos] = self[from_pos]
+    piece = self[from_pos]
+    self[to_pos] = piece.class.new(piece.color, to_pos, self)
     self[from_pos] = Nullpiece.instance
+  end
+
+  def valid?(from_pos, to_pos)
+    self[from_pos].valid_moves.include?(to_pos) && self[to_pos].color != self[from_pos].color
+  end
+
+  def update_board
+    @grid.each_with_index do |r, row|
+      r.each_index do |col|
+        pos = [row, col]
+        next if self[pos] == Nullpiece.instance
+        self[pos].board = self
+      end
+    end
   end
 
 end
