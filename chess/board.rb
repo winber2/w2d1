@@ -80,10 +80,14 @@ class Board
   end
 
   def move_piece(from_pos, to_pos)
+    if self[from_pos] == Nullpiece.instance
+      raise "There is no piece"
+    else
 
+    end
+
+    self[to_pos] = self[from_pos]
+    self[from_pos] = Nullpiece.instance
   end
-
-
-
 
 end

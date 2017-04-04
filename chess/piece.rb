@@ -29,8 +29,9 @@ class Piece
   end
 
   def move_into_check(to_pos)
-    to_pos.all? { |el| el.between?(0, 7)}
+
   end
+
 end
 
 class Pawn < Piece
@@ -41,6 +42,8 @@ class Pawn < Piece
   def moves
     forward_steps + side_attacks
   end
+
+
 
   protected
 
@@ -54,14 +57,21 @@ class Pawn < Piece
 
   def forward_steps
     if start_row?
-      [forward_dir, forward_dir.map { |el| el * 2 }]
+      forward_arr = [forward_dir, forward_dir.map { |el| el * 2 }]
     else
-      [forward_dir]
+      forward_arr = [forward_dir]
+    end
+
+    forward_arr.select do |move|
+      next if move == forward_arr[1] && @board[forward_arr[0]] != Nullpiece.instance
+      @board[move] == Nullpiece.instance
     end
   end
 
   def side_attacks
-    [[forward_dir[0], forward_dir[1] + 1], [forward_dir[0], forward_dir[1] - 1]]
+    att_arr = [[forward_dir[0], forward_dir[1] + 1], [forward_dir[0], forward_dir[1] - 1]]
+    att_arr = att_arr.select { |move| move.all? {|idx| idx.between?(0,7)} }
+    att_arr.select { |move| @board[move] != Nullpiece.instance && @board[move].color != @color}
   end
 
 end
@@ -84,7 +94,9 @@ class King < Piece
       end
     end
 
-    move_arr
+    move_arr.select do |move|
+      @board[move].color != @color
+    end
   end
 
 end
@@ -115,7 +127,9 @@ class Knight < Piece
       move_arr << [@pos[0] + move[0], @pos[1] + move[1]]
     end
 
-    move_arr
+    move_arr.select do |move|
+      @board[move] != @color
+    end
   end
 
 end

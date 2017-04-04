@@ -17,12 +17,31 @@ class Display
 
   def show
     input = nil
-    @board[[0,0]] = "#{@board[[0,0]]}".colorize(:background => :blue)
+    prev_pos = @cursor.cursor_pos
+    @board[prev_pos] = "#{@board[prev_pos]}".colorize(:background => :light_cyan)
     render
     while input.nil?
       input = @cursor.get_input
+      @board[prev_pos] = "#{@board[prev_pos]}".colorize(:background => :white)
       @board[@cursor.cursor_pos] = "#{@board[@cursor.cursor_pos]}".colorize(:background => :light_cyan)
+      prev_pos = @cursor.cursor_pos
       render
     end
+
+    from = input
+    input = nil
+
+    while input.nil?
+      input = @cursor.get_input
+      @board[prev_pos] = "#{@board[prev_pos]}".colorize(:background => :white)
+      @board[@cursor.cursor_pos] = "#{@board[@cursor.cursor_pos]}".colorize(:background => :light_cyan)
+      prev_pos = @cursor.cursor_pos
+      render
+    end
+
+    to = input
+    @board.move_piece(from, to)
+    render
+    nil
   end
 end
