@@ -17,12 +17,11 @@ class Display
 
   def show
     input = nil
-    @board[[0,0]] = " ".colorize(:background => :blue)
+    @board[[0,0]] = "#{@board[[0,0]]}".colorize(:background => :blue)
     render
     while input.nil?
       input = @cursor.get_input
-      next if input.nil?
-      @board[input] = " ".colorize(:background => :blue)
+      @board[@cursor.cursor_pos] = "#{@board[@cursor.cursor_pos]}".colorize(:background => :light_cyan)
       render
     end
   end

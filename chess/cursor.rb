@@ -77,7 +77,13 @@ class Cursor
 
   def handle_key(key)
     case key
-    when MOVES.keys.include?(key)
+    when :left
+      update_pos(key)
+    when :right
+      update_pos(key)
+    when :up
+      update_pos(key)
+    when :down
       update_pos(key)
     when :return
       return @cursor_pos
@@ -89,6 +95,7 @@ class Cursor
   end
 
   def update_pos(diff)
-    @cursor_pos = MOVES[diff].map.with_index { |el, idx| el + pos[idx] }
+    @cursor_pos = MOVES[diff].map.with_index { |el, idx| el + @cursor_pos[idx] }
+    nil
   end
 end
