@@ -93,14 +93,37 @@ class Board
     self[from_pos].valid_moves.include?(to_pos) && self[to_pos].color != self[from_pos].color
   end
 
-  def update_board
-    @grid.each_with_index do |r, row|
+  def in_check?(color)
+    king_pos = find_king_pos(color)
+
+    @grid.each_with_index do |r,row|
       r.each_index do |col|
         pos = [row, col]
         next if self[pos] == Nullpiece.instance
-        self[pos].board = self
+        return true if self[pos].valid_moves.include?(king_pos) && self[pos].color != color
       end
     end
+    false
   end
+
+  def find_king_pos(color)
+    king_pos = nil
+    @grid.each_with_index do |r,row|
+      r.each_index do |col|
+        pos = [row, col]
+        king_pos = pos if self[pos].is_a?(King) && self[pos].color == color
+      end
+    end
+    king_pos
+  end
+
+  def checkmate?(color)
+    king_pos = find_king_pos(color)
+
+    self[king_pos].valid_moves.all? do |move|
+      in_check?(color)
+    end
+  end
+
 
 end

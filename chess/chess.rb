@@ -15,14 +15,18 @@ class Game
         @display.show
         system('clear')
       end
-    rescue
-      puts "Invalid move"
-      retry
+    # rescue
+    #   puts "Invalid move"
+    #   retry
     end
+    @display.render
+    puts "Someone won"
   end
 
   def over?
-
+    [:white, :black].any? do |color|
+      @display.board.checkmate?(color) && @display.board.in_check?(color)
+    end
   end
 
 end
