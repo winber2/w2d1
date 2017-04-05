@@ -25,7 +25,7 @@ module Slideable
   end
 
   def horizontal_dirs
-    [[1,0], [-1, 0], [0,1],[0,-1]]
+    [[1,0], [-1,0], [0,1],[0,-1]]
   end
 
   def diagonal_dirs
@@ -35,7 +35,7 @@ module Slideable
   def grow_unblocked_moves_in_dir(dx, dy)
     move_arr = []
     move = [@pos[0] + dx, @pos[1] + dy]
-    while valid(move)
+    while valid(move) && @board[move] == Nullpiece.instance
       move_arr << move
       move = [move[0] + dx, move[1] + dy]
     end
@@ -45,10 +45,7 @@ module Slideable
 
 
   def valid(move)
-    move.all? do |idx| idx.between?(0,7) &&
-      (@board[move] == Nullpiece.instance ||
-      @board[move].color == @board[move].opposite_color)
-    end
+    move.all? { |idx| idx.between?(0,7) }
   end
 
 end

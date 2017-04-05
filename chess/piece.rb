@@ -5,6 +5,22 @@ class Piece
   attr_reader :symbol, :pos, :color
   attr_accessor :selected, :board
   COLORS = {:white => :red, :black => :black, nil => :black}
+
+  PIECES = {
+    [:king, :white] => "\u2654",
+    [:king, :black] => "\u265A",
+    [:queen, :white] => "\u2655",
+    [:queen, :black] => "\u265B",
+    [:bishop, :white] => "\u2657",
+    [:bishop, :black] => "\u265D",
+    [:knight, :white] => "\u2658",
+    [:knight, :black] => "\u265E",
+    [:rook, :white] => "\u2656",
+    [:rook, :black] => "\u265C",
+    [:pawn, :white] => "\u2659",
+    [:pawn, :black] => "\u265F",
+  }
+
   def initialize(color, pos, board, symbol = nil)
     @symbol = symbol
     @board = board
@@ -20,9 +36,9 @@ class Piece
 
   def selected?
     unless @selected
-      "#{@symbol[0].upcase.colorize(:color => COLORS[@color], :background => :yellow)}"
+      "#{PIECES[[@symbol,@color]]}".colorize(:background => :yellow)
     else
-      "#{@symbol[0].upcase.colorize(:color => COLORS[@color], :background => :light_cyan)}"
+      "#{PIECES[[@symbol,@color]]}".colorize(:background => :light_cyan)
     end
   end
 
@@ -120,6 +136,10 @@ class King < Piece
       end
     end
 
+    move_arr.select! do |move|
+      move.all? { |idx| idx.between?(0,7) }
+    end
+
     move_arr.select do |move|
       @board[move].color != @color
     end
@@ -141,7 +161,7 @@ class Knight < Piece
     [-1, 2],
     [-1, -2]
   ]
-  def initialize(color, pos, board, symbol = :night)
+  def initialize(color, pos, board, symbol = :knight)
     super
   end
 
@@ -153,8 +173,12 @@ class Knight < Piece
       move_arr << [@pos[0] + move[0], @pos[1] + move[1]]
     end
 
+    move_arr.select! do |move|
+      move.all? { |idx| idx.between?(0,7) }
+    end
+
     move_arr.select do |move|
-      @board[move] != @color
+      @board[move].color != @color
     end
   end
 
@@ -228,6 +252,8 @@ end
 
 class Nullpiece < Piece
   include Singleton
+
+  attr_reader :color, :symbol
 
   def initialize
     @symbol = nil
